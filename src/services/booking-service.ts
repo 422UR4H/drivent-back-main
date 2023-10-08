@@ -13,9 +13,10 @@ type BookingId = {
 };
 
 async function createBooking(roomId: number, userId: number): Promise<BookingId> {
-    const { id } = await enrollmentRepository.findWithAddressByUserId(userId);
-    const ticket = await ticketsRepository.findTicketByEnrollmentId(id);
+    const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+    if (enrollment == null) throw forbiddenError();
 
+    const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
     if (ticket == null) throw forbiddenError("Ticket not found");
     if (ticket.TicketType.isRemote) throw forbiddenError("Ticket type is remote");
     if (!ticket.TicketType.includesHotel) throw forbiddenError("Ticket type is not includes hotel");
@@ -23,7 +24,6 @@ async function createBooking(roomId: number, userId: number): Promise<BookingId>
 
     const { Rooms: rooms } = await hotelRepository.findRoomsByHotelId(roomId);
     const room = rooms.find(room => room.id === roomId);
-
     if (room === undefined) throw notFoundError();
 
     if ((await bookingRepository.findByRoomId(roomId)) != null) {
