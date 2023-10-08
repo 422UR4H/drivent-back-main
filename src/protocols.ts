@@ -50,5 +50,4 @@ export type InputPaymentBody = {
 
 export type PaymentParams = Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>;
 
-export type CreateBooking = Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>;
-export type UpdateBooking = Pick<Booking, 'roomId'>;
+export type InputBooking = Omit<Booking, 'id' | 'createdAt' | 'updatedAt' | 'userId'>;
