@@ -98,3 +98,92 @@ describe('createBooking', () => {
         expect(result).toEqual({ bookingId: booking.id });
     });
 });
+
+describe('updateBooking', () => {
+    it('should throw 403 status when ticket type is remote', async () => {
+        const enrollment = await randomEnrollmentWithAddress();
+        const ticketType = randomTicketType(true, true);
+        const ticket = randomTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+        jest
+            .spyOn(enrollmentRepository, "findWithAddressByUserId")
+            .mockResolvedValueOnce(enrollment);
+
+        jest
+            .spyOn(ticketsRepository, "findTicketByEnrollmentId")
+            .mockResolvedValueOnce({ ...ticket, TicketType: ticketType });
+
+        const result = bookingService.update(1, enrollment.userId);
+        expect(result).rejects.toEqual(forbiddenError("Ticket type is remote"));
+    });
+
+    it('should throw 403 status when ticket type without includes hotel', async () => {
+        const enrollment = await randomEnrollmentWithAddress();
+        const ticketType = randomTicketType(false, false);
+        const ticket = randomTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+        jest
+            .spyOn(enrollmentRepository, "findWithAddressByUserId")
+            .mockResolvedValueOnce(enrollment);
+
+        jest
+            .spyOn(ticketsRepository, "findTicketByEnrollmentId")
+            .mockResolvedValueOnce({ ...ticket, TicketType: ticketType });
+
+        const result = bookingService.update(1, enrollment.userId);
+        expect(result).rejects.toEqual(forbiddenError("Ticket type is not includes hotel"));
+    });
+
+    it('should throw 403 status when ticket type is not PAID yet', async () => {
+        const enrollment = await randomEnrollmentWithAddress();
+        const ticketType = randomTicketType(false, true);
+        const ticket = randomTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+
+        jest
+            .spyOn(enrollmentRepository, "findWithAddressByUserId")
+            .mockResolvedValueOnce(enrollment);
+
+        jest
+            .spyOn(ticketsRepository, "findTicketByEnrollmentId")
+            .mockResolvedValueOnce({ ...ticket, TicketType: ticketType });
+
+        const result = bookingService.update(1, enrollment.userId);
+        expect(result).rejects.toEqual(forbiddenError("Ticket is not paid yet"));
+    });
+
+    it('should return status 200 and bookingId when ticket type is not remote, includes hotel and have PAID', async () => {
+        const enrollment = await randomEnrollmentWithAddress();
+        const ticketType = randomTicketType(false, true);
+        const ticket = randomTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+        const room = randomRoom();
+        const booking = randomBooking(enrollment.userId, room.id);
+        const newBooking = randomBooking(enrollment.userId);
+
+        jest
+            .spyOn(enrollmentRepository, "findWithAddressByUserId")
+            .mockResolvedValueOnce(enrollment);
+
+        jest
+            .spyOn(ticketsRepository, "findTicketByEnrollmentId")
+            .mockResolvedValueOnce({ ...ticket, TicketType: ticketType });
+
+        jest
+            .spyOn(hotelRepository, "findRoomById")
+            .mockResolvedValueOnce(room);
+
+        jest
+            .spyOn(bookingRepository, "findByUserId")
+            .mockResolvedValueOnce({ id: booking.id, Room: room });
+
+        jest
+            .spyOn(bookingRepository, "findByRoomId")
+            .mockResolvedValueOnce(booking);
+
+        jest
+            .spyOn(bookingRepository, "update")
+            .mockResolvedValueOnce(newBooking);
+
+        const result = await bookingService.update(1, enrollment.userId);
+        expect(result).toEqual({ bookingId: newBooking.id });
+    });
+});
