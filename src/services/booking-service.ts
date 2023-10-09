@@ -1,5 +1,5 @@
 import { Booking, TicketStatus } from "@prisma/client";
-import { forbiddenError, notFoundError } from "@/errors";
+import { conflictError, forbiddenError, notFoundError } from "@/errors";
 import { bookingRepository } from "@/repositories/booking-repository";
 import {
     enrollmentRepository,
@@ -22,9 +22,8 @@ async function createBooking(roomId: number, userId: number): Promise<BookingId>
     if (!ticket.TicketType.includesHotel) throw forbiddenError("Ticket type is not includes hotel");
     if (ticket.status !== TicketStatus.PAID) throw forbiddenError("Ticket is not paid yet");
 
-    const { Rooms: rooms } = await hotelRepository.findRoomsByHotelId(roomId);
-    const room = rooms.find(room => room.id === roomId);
-    if (room === undefined) throw notFoundError();
+    const hotel = await hotelRepository.findRoomById(roomId);
+    if (hotel == null) throw notFoundError();
 
     if ((await bookingRepository.findByRoomId(roomId)) != null) {
         throw forbiddenError("Room already reserved");
