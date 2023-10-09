@@ -208,16 +208,16 @@ describe("GET /booking", () => {
     });
 });
 
-describe("PUT /booking", () => {
+describe("PUT /booking/:bookingId", () => {
     it('should respond with status 401 if no token is given', async () => {
-        const { status } = await server.put('/booking').send({ roomId: 1 });
+        const { status } = await server.put('/booking/1').send({ roomId: 1 });
         expect(status).toBe(httpStatus.UNAUTHORIZED);
     });
 
     it('should respond with status 401 if given token is not valid', async () => {
         const token = faker.lorem.word();
         const { status } = await server
-            .put('/booking')
+            .put('/booking/1')
             .send({ roomId: 1 })
             .set('Authorization', `Bearer ${token}`);
 
@@ -229,7 +229,7 @@ describe("PUT /booking", () => {
 
         const token = jwt.sign({ userId }, process.env.JWT_SECRET);
         const { status } = await server
-            .put('/booking')
+            .put('/booking/1')
             .send({ roomId: 1 })
             .set('Authorization', `Bearer ${token}`);
 
@@ -240,7 +240,7 @@ describe("PUT /booking", () => {
         it("should respond with status 403 when user does not have an enrollment", async () => {
             const token = await generateValidToken();
             const { status } = await server
-                .put('/booking')
+                .put('/booking/1')
                 .send({ roomId: 1 })
                 .set('Authorization', `Bearer ${token}`);
 
@@ -253,7 +253,7 @@ describe("PUT /booking", () => {
             await createEnrollmentWithAddress(user);
 
             const { status } = await server
-                .put('/booking')
+                .put('/booking/1')
                 .send({ roomId: 1 })
                 .set('Authorization', `Bearer ${token}`);
 
@@ -269,7 +269,7 @@ describe("PUT /booking", () => {
             await createPayment(ticket.id, ticketType.price);
 
             const { status } = await server
-                .put('/booking')
+                .put('/booking/1')
                 .send({ roomId: 1 })
                 .set('Authorization', `Bearer ${token}`);
 
@@ -287,7 +287,7 @@ describe("PUT /booking", () => {
             await createPayment(ticket.id, ticketType.price);
 
             const { status } = await server
-                .put('/booking')
+                .put('/booking/1')
                 .send({ roomId: room.id })
                 .set('Authorization', `Bearer ${token}`);
 
@@ -307,11 +307,11 @@ describe("PUT /booking", () => {
             const user2 = await createUser();
             const enrollment2 = await createEnrollmentWithAddress(user2);
             const ticket2 = await createTicket(enrollment2.id, ticketType.id, TicketStatus.PAID);
+            const booking = await createBooking(user2.id, room.id);
             await createPayment(ticket2.id, ticketType.price);
-            await createBooking(user2.id, room.id);
 
             const { status } = await server
-                .put('/booking')
+                .put(`/booking/${booking.id}`)
                 .send({ roomId: room.id })
                 .set('Authorization', `Bearer ${token}`);
 
@@ -326,17 +326,17 @@ describe("PUT /booking", () => {
             const enrollment = await createEnrollmentWithAddress(user);
             const ticketType = await createTicketType(false, true);
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+            const booking = await createBooking(user.id, room.id);
             await createPayment(ticket.id, ticketType.price);
-            await createBooking(user.id, room.id);
 
             const { status, body } = await server
-                .put('/booking')
+                .put(`/booking/${booking.id}`)
                 .send({ roomId: room.id })
                 .set('Authorization', `Bearer ${token}`);
 
             expect(status).toBe(httpStatus.OK);
             expect(body).toEqual({
-                bookingId: expect.any(Number)
+                bookingId: booking.id
             });
         });
     });

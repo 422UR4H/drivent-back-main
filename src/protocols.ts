@@ -52,6 +52,8 @@ export type PaymentParams = Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type InputBooking = Omit<Booking, 'id' | 'createdAt' | 'updatedAt' | 'userId'>;
 
+export type BookingParam = { bookingId: string };
+
 export type EnrollmentWithAddress = Enrollment & { Address: Address[] };
 
 export type TicketWithType = Ticket & { TicketType: TicketType };

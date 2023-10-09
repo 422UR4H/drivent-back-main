@@ -113,7 +113,7 @@ describe('updateBooking', () => {
             .spyOn(ticketsRepository, "findTicketByEnrollmentId")
             .mockResolvedValueOnce({ ...ticket, TicketType: ticketType });
 
-        const result = bookingService.update(1, enrollment.userId);
+        const result = bookingService.update(1, enrollment.userId, 1);
         expect(result).rejects.toEqual(forbiddenError("Ticket type is remote"));
     });
 
@@ -130,7 +130,7 @@ describe('updateBooking', () => {
             .spyOn(ticketsRepository, "findTicketByEnrollmentId")
             .mockResolvedValueOnce({ ...ticket, TicketType: ticketType });
 
-        const result = bookingService.update(1, enrollment.userId);
+        const result = bookingService.update(1, enrollment.userId, 1);
         expect(result).rejects.toEqual(forbiddenError("Ticket type is not includes hotel"));
     });
 
@@ -147,7 +147,7 @@ describe('updateBooking', () => {
             .spyOn(ticketsRepository, "findTicketByEnrollmentId")
             .mockResolvedValueOnce({ ...ticket, TicketType: ticketType });
 
-        const result = bookingService.update(1, enrollment.userId);
+        const result = bookingService.update(1, enrollment.userId, 1);
         expect(result).rejects.toEqual(forbiddenError("Ticket is not paid yet"));
     });
 
@@ -183,7 +183,7 @@ describe('updateBooking', () => {
             .spyOn(bookingRepository, "update")
             .mockResolvedValueOnce(newBooking);
 
-        const result = await bookingService.update(1, enrollment.userId);
+        const result = await bookingService.update(1, enrollment.userId, 1);
         expect(result).toEqual({ bookingId: newBooking.id });
     });
 });

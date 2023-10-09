@@ -40,7 +40,7 @@ async function find(userId: number): Promise<OutputBooking> {
     return booking;
 }
 
-async function update(roomId: number, userId: number): Promise<BookingId> {
+async function update(roomId: number, userId: number, bookingId: number): Promise<BookingId> {
     const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
     if (enrollment == null) throw forbiddenError();
 
@@ -64,8 +64,8 @@ async function update(roomId: number, userId: number): Promise<BookingId> {
     // if ((await bookingRepository.findByRoomId(roomId)).userId != userId) {
     //     throw forbiddenError("Room already reserved by other user");
     // }
-    const { id: bookingId } = await bookingRepository.update(roomId, userId);
-    return { bookingId };
+    const { id } = await bookingRepository.update(roomId, userId);
+    return { bookingId: id };
 }
 
 export const bookingService = {
