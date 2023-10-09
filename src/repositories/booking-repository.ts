@@ -27,6 +27,28 @@ function update(roomId: number, userId: number) {
     });
 }
 
+function count(roomId: number) {
+    // return prisma.booking.groupBy({=
+    //     by: ["roomId"],
+    //     _count: { _all: true },
+    //     having: { roomId }
+    // })
+
+    return prisma.booking.aggregate({
+        where: { roomId },
+        _count: { _all: true }
+    });
+
+    // return prisma.booking.findMany({
+    //     where: { roomId },
+    //     select: {
+    //         id: true,
+    //         Room: { select: { capacity: true } }
+    //     }
+    // });
+}
+
 export const bookingRepository = {
-    create, findByRoomId, findByUserId, update
+    create, findByRoomId, findByUserId, update,
+    count
 };

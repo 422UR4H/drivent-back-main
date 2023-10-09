@@ -104,7 +104,7 @@ describe("POST /booking", () => {
             await createPayment(ticket.id, ticketType.price);
 
             const hotel = await createHotel();
-            const room = await createRoomWithHotelId(hotel.id);
+            const room = await createRoomWithHotelId(hotel.id, 1);
             const user2 = await createUser();
             const enrollment2 = await createEnrollmentWithAddress(user2);
             const ticket2 = await createTicket(enrollment2.id, ticketType.id, TicketStatus.PAID);
@@ -303,7 +303,7 @@ describe("PUT /booking", () => {
             await createPayment(ticket.id, ticketType.price);
 
             const hotel = await createHotel();
-            const room = await createRoomWithHotelId(hotel.id);
+            const room = await createRoomWithHotelId(hotel.id, 1);
             const user2 = await createUser();
             const enrollment2 = await createEnrollmentWithAddress(user2);
             const ticket2 = await createTicket(enrollment2.id, ticketType.id, TicketStatus.PAID);
