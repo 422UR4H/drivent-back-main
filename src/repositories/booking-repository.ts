@@ -20,8 +20,11 @@ function findByUserId(userId: number) {
     });
 }
 
-function update() {
-
+function update(roomId: number, userId: number) {
+    return prisma.booking.update({
+        where: { userId },
+        data: { roomId }
+    });
 }
 
 export const bookingRepository = {

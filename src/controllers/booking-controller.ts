@@ -18,5 +18,9 @@ export async function getBooking(req: AuthenticatedRequest, res: Response): Prom
 }
 
 export async function putBooking(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const { roomId } = req.body as InputBooking;
+    const { userId } = req;
+    const result = await bookingService.update(roomId, userId);
 
+    res.send(result);
 }
