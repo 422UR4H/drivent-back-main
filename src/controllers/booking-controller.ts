@@ -6,7 +6,7 @@ import { Response } from "express";
 export async function postBooking(req: AuthenticatedRequest, res: Response): Promise<void> {
     const { roomId } = req.body as InputBooking;
     const { userId } = req;
-    const result = await bookingService.createBooking(roomId, userId);
+    const result = await bookingService.create(roomId, userId);
 
     res.send(result);
 }

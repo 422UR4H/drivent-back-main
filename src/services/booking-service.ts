@@ -12,7 +12,7 @@ type BookingId = {
     bookingId: number
 };
 
-async function createBooking(roomId: number, userId: number): Promise<BookingId> {
+async function create(roomId: number, userId: number): Promise<BookingId> {
     const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
     if (enrollment == null) throw forbiddenError();
 
@@ -22,8 +22,8 @@ async function createBooking(roomId: number, userId: number): Promise<BookingId>
     if (!ticket.TicketType.includesHotel) throw forbiddenError("Ticket type is not includes hotel");
     if (ticket.status !== TicketStatus.PAID) throw forbiddenError("Ticket is not paid yet");
 
-    const hotel = await hotelRepository.findRoomById(roomId);
-    if (hotel == null) throw notFoundError();
+    const room = await hotelRepository.findRoomById(roomId);
+    if (room == null) throw notFoundError();
 
     if ((await bookingRepository.findByRoomId(roomId)) != null) {
         throw forbiddenError("Room already reserved");
@@ -33,14 +33,14 @@ async function createBooking(roomId: number, userId: number): Promise<BookingId>
     return { bookingId };
 }
 
-async function findBooking(): Promise<void> {
+async function find(): Promise<void> {
 
 }
 
-async function updateBooking(): Promise<void> {
+async function update(): Promise<void> {
 
 }
 
 export const bookingService = {
-    createBooking, findBooking, updateBooking
+    create, find, update
 };
