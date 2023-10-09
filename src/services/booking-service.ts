@@ -6,6 +6,7 @@ import {
     hotelRepository,
     ticketsRepository
 } from "@/repositories";
+import { OutputBooking } from "@/protocols";
 
 
 type BookingId = {
@@ -33,8 +34,10 @@ async function create(roomId: number, userId: number): Promise<BookingId> {
     return { bookingId };
 }
 
-async function find(): Promise<void> {
-
+async function find(userId: number): Promise<OutputBooking> {
+    const booking = await bookingRepository.findByUserId(userId);
+    if (booking == null) throw notFoundError();
+    return booking;
 }
 
 async function update(): Promise<void> {
