@@ -26,14 +26,10 @@ async function create(roomId: number, userId: number): Promise<BookingId> {
     const room = await hotelRepository.findRoomById(roomId);
     if (room == null) throw notFoundError();
 
-    // FIXME: validate by count
     const result = await bookingRepository.count(roomId);
     if (result._count._all >= room.capacity) {
         throw forbiddenError("Room has already full")
     }
-    // if ((await bookingRepository.findByRoomId(roomId)) != null) {
-    //     throw forbiddenError("Room already reserved");
-    // }
     const { id: bookingId } = await bookingRepository.create(roomId, userId);
     return { bookingId };
 }
