@@ -14,3 +14,16 @@ export async function createUser(params: Partial<User> = {}): Promise<User> {
     },
   });
 }
+
+export async function randomUser(params: Partial<User> = {}): Promise<User> {
+  const incomingPassword = params.password || faker.internet.password(6);
+  const hashedPassword = await bcrypt.hash(incomingPassword, 10);
+
+  return {
+    id: faker.datatype.number({ min: 1 }),
+    email: faker.internet.email(),
+    password: hashedPassword,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+}

@@ -1,5 +1,6 @@
 import faker from '@faker-js/faker';
 import { prisma } from '@/config';
+import { Room } from '@prisma/client';
 
 export async function createHotel() {
   return await prisma.hotel.create({
@@ -18,4 +19,15 @@ export async function createRoomWithHotelId(hotelId: number) {
       hotelId: hotelId,
     },
   });
+}
+
+export function randomRoom(): Room {
+  return {
+    id: faker.datatype.number({ min: 1 }),
+    name: faker.name.findName(),
+    capacity: faker.datatype.number({ min: 1, max: 20 }),
+    hotelId: faker.datatype.number({ min: 1 }),
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
 }
